@@ -1,15 +1,20 @@
 version: "2.2"
 services:
+  # https://hub.docker.com/r/davyinsa/elasticsearch-ik
   elasticsearch:
-    image: elasticsearch:7.14.0
-    container_name: elasticsearch
+    image: davyinsa/elasticsearch-ik:7.13.3
+    container_name: es01
     environment:
-      - cluster.name=docker-cluster
+      - discovery.type=single-node
+      - node.name=es01
+      - cluster.name=es-docker-cluster
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms128m -Xmx128m"
+      - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      # - xpack.security.enabled=true
+      # - ELASTIC_PASSWORD=password
       - http.cors.enabled=true
       - http.cors.allow-origin=*
-      - discovery.type=single-node
+      # - http.cors.allow-headers=Authorization
     ulimits:
       memlock:
         soft: -1
@@ -21,7 +26,7 @@ services:
     networks:
       - esnet
   kibana:
-    image: kibana:7.14.0
+    image: kibana:7.13.3
     container_name: kibana
     environment:
       SERVER_NAME: kibana.local
@@ -30,7 +35,7 @@ services:
       - "5601:5601"
     networks:
       - esnet
-
+  # http://localhost:9100/?base_uri=http://localhost:9200/&auth_user=elastic&auth_password=password
   headPlugin:
     image: "mobz/elasticsearch-head:5-alpine"
     container_name: head
